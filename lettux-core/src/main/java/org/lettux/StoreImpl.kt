@@ -1,7 +1,7 @@
 package org.lettux
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 import org.lettux.core.*
 
 fun <STATE : Any> createStore(
@@ -61,14 +61,14 @@ internal class StoreImpl<STATE>(
         states.value = newState
     }
 
-    override fun send(action: Action, withDispatcher: CoroutineDispatcher): Job {
+    override fun send(action: Action): Job {
         val actionContext = DefaultActionContext(
             store = this,
             action = action,
             setState = ::setState,
         )
 
-        return storeScope.launch(withDispatcher, start = CoroutineStart.UNDISPATCHED) {
+        return storeScope.launch(start = CoroutineStart.UNDISPATCHED) {
             middlewareChain.proceed(actionContext as ActionContext<Any>)
         }
     }
@@ -80,7 +80,7 @@ internal class StoreImpl<STATE>(
     ): Store<SLICE> {
         return StoreImpl(
             states = SlicedStatesFlow(states, stateToSlice, sliceToState),
-            actionHandler = ActionHandler {
+            actionHandler = {
                 val actionContext = DefaultActionContext(
                     action = action,
                     store = this@StoreImpl,
