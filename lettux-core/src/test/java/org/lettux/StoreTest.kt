@@ -1,8 +1,9 @@
+package org.lettux
+
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.lettux.core.*
-import org.lettux.createStore
 import org.junit.jupiter.api.Test
 
 internal class StoreImplTest {
