@@ -19,7 +19,7 @@ internal class DefaultActionContextTest {
             action = TestAction,
             getState = { parentState },
             setState = { parentState = it },
-            send = {},
+            sendToStore = {},
         )
 
         val slicedActionContext = actionContext.slice(
