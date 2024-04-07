@@ -1,9 +1,10 @@
-package org.lettux
+package org.lettux.slice
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
 import org.lettux.core.*
 import org.junit.jupiter.api.Test
+import org.lettux.createStore
 
 internal class SliceTest {
 

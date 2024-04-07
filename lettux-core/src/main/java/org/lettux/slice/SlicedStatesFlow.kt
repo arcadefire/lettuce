@@ -1,4 +1,4 @@
-package org.lettux
+package org.lettux.slice
 
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,13 +1,13 @@
-package org.lettux
+package org.lettux.extension
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
-import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.api.Test
 import org.lettux.core.Action
 import org.lettux.core.ActionHandler
 import org.lettux.core.state
+import org.lettux.createStore
 
 internal class ActionHandlerExtensionKtTest {
 

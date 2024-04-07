@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.lettux.core.*
 import org.junit.jupiter.api.Test
 
-internal class StoreImplTest {
+internal class DefaultStoreTest {
 
     private object HandledAction : Action
     private object UnHandledAction : Action

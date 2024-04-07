@@ -3,20 +3,21 @@ package org.lettux
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.lettux.core.*
+import org.lettux.slice.SlicedStatesFlow
 
 fun <STATE : Any> createStore(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
     storeScope: CoroutineScope,
-): Store<STATE> = StoreImpl(
+): Store<STATE> = DefaultStore(
     states = MutableStateFlow(initialState),
     actionHandler = actionHandler,
     storeScope = storeScope,
     middlewares = middlewares,
 )
 
-internal class StoreImpl<STATE>(
+internal class DefaultStore<STATE>(
     override val states: MutableStateFlow<STATE>,
     private val actionHandler: ActionHandler<STATE>,
     private val storeScope: CoroutineScope,
@@ -66,7 +67,7 @@ internal class StoreImpl<STATE>(
             action = action,
             getState = { states.value },
             setState = ::setState,
-            send = ::send,
+            sendToStore = ::send,
         )
         return storeScope.launch(start = CoroutineStart.UNDISPATCHED) {
             middlewareChain.proceed(actionContext as ActionContext<Any>)
@@ -78,14 +79,14 @@ internal class StoreImpl<STATE>(
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware>,
     ): Store<SLICE> {
-        return StoreImpl(
+        return DefaultStore(
             states = SlicedStatesFlow(states, stateToSlice, sliceToState),
             actionHandler = {
                 val actionContext = DefaultActionContext(
                     action = action,
                     getState = { states.value },
                     setState = ::setState,
-                    send = ::send,
+                    sendToStore = ::send,
                 )
                 middlewareChain.proceed(actionContext as ActionContext<Any>)
             },
