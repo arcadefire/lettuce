@@ -63,11 +63,11 @@ internal class StoreImpl<STATE>(
 
     override fun send(action: Action): Job {
         val actionContext = DefaultActionContext(
-            store = this,
             action = action,
+            getState = { states.value },
             setState = ::setState,
+            send = ::send,
         )
-
         return storeScope.launch(start = CoroutineStart.UNDISPATCHED) {
             middlewareChain.proceed(actionContext as ActionContext<Any>)
         }
@@ -83,8 +83,9 @@ internal class StoreImpl<STATE>(
             actionHandler = {
                 val actionContext = DefaultActionContext(
                     action = action,
-                    store = this@StoreImpl,
-                    setState = { newState -> setState(newState) },
+                    getState = { states.value },
+                    setState = ::setState,
+                    send = ::send,
                 )
                 middlewareChain.proceed(actionContext as ActionContext<Any>)
             },

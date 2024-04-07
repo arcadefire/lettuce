@@ -1,7 +1,8 @@
+package org.lettux
+
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
 import org.lettux.core.*
-import org.lettux.createStore
 import org.junit.jupiter.api.Test
 
 internal class SliceTest {
@@ -27,7 +28,6 @@ internal class SliceTest {
         actionHandler = testActionHandler,
         storeScope = TestScope(),
     )
-
 
     @Test
     fun `should slice from the parent store`() {
