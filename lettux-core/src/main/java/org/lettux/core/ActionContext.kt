@@ -8,5 +8,5 @@ interface ActionContext<STATE> {
     fun <SLICE> slice(
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
-    ) : ActionContext<SLICE>
+    ): ActionContext<SLICE>
 }

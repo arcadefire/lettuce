@@ -1,8 +1,14 @@
 package org.lettux
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.lettux.core.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.lettux.core.Action
+import org.lettux.core.ActionContext
+import org.lettux.core.Chain
+import org.lettux.core.Middleware
+import org.lettux.core.Outcome
+import org.lettux.core.Store
 import org.lettux.extension.defaultLaunch
 import org.lettux.slice.SlicedStatesFlow
 
@@ -22,6 +28,7 @@ internal class DefaultStore<STATE>(
     ): Store<SLICE> {
         return DefaultStore(
             states = SlicedStatesFlow(states, stateToSlice, sliceToState),
+            storeScope = sliceScope,
             dispatch = { action ->
                 val bridgeChain = Chain {
                     val parentOutcome = dispatch(action)
@@ -44,7 +51,6 @@ internal class DefaultStore<STATE>(
                 )
                 chain.proceed(actionContext as ActionContext<Any>)
             },
-            storeScope = sliceScope,
         )
     }
 }

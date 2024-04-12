@@ -1,10 +1,14 @@
 package org.lettux.slice
 
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.lettux.core.*
+import org.lettux.core.Action
+import org.lettux.core.ActionHandler
+import org.lettux.core.Middleware
+import org.lettux.core.Outcome
+import org.lettux.core.Store
+import org.lettux.core.state
 import org.lettux.factory.sliceStoreFactory
 import org.lettux.factory.storeFactory
 

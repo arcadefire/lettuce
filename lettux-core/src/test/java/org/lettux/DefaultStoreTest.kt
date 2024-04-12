@@ -2,13 +2,16 @@ package org.lettux
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import org.lettux.core.*
 import org.junit.jupiter.api.Test
+import org.lettux.core.ActionHandler
+import org.lettux.core.Middleware
+import org.lettux.core.Outcome
+import org.lettux.core.state
 import org.lettux.factory.storeFactory
 
 internal class DefaultStoreTest {
 
-    private val testActionHandler = ActionHandler<TestState> {
+    private val testActionHandler = ActionHandler<PlainState> {
         if (action is HandledAction) {
             commit(state.copy(value = state.value + 1))
         }
@@ -17,13 +20,13 @@ internal class DefaultStoreTest {
     @Test
     fun `should send an action to the store and mutate the state`() = runTest {
         val store = storeFactory(
-            initialState = TestState(value = 0),
+            initialState = PlainState(value = 0),
             actionHandler = testActionHandler,
         ).get(storeScope = this)
 
         store.send(HandledAction)
 
-        store.state shouldBe TestState(value = 1)
+        store.state shouldBe PlainState(value = 1)
     }
 
     @Test
@@ -38,7 +41,7 @@ internal class DefaultStoreTest {
             chain.proceed(action)
         }
         val store = storeFactory(
-            initialState = TestState(),
+            initialState = PlainState(),
             actionHandler = testActionHandler,
             middlewares = listOf(first, second)
         ).get(storeScope = this)
@@ -55,14 +58,14 @@ internal class DefaultStoreTest {
             chain.proceed(action).also { outcome = it }
         }
         val store = storeFactory(
-            initialState = TestState(),
+            initialState = PlainState(),
             actionHandler = testActionHandler,
             middlewares = listOf(middleware)
         ).get(storeScope = this)
 
         store.send(HandledAction).join()
 
-        outcome shouldBe Outcome.StateMutated(TestState(value = 1))
+        outcome shouldBe Outcome.StateMutated(PlainState(value = 1))
     }
 
     @Test
@@ -73,7 +76,7 @@ internal class DefaultStoreTest {
                 chain.proceed(action).also { outcome = it }
             }
             val store = storeFactory(
-                initialState = TestState(),
+                initialState = PlainState(),
                 actionHandler = testActionHandler,
                 middlewares = listOf(middleware)
             ).get(storeScope = this)
