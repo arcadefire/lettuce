@@ -4,7 +4,7 @@ import org.lettux.core.Action
 import org.lettux.core.ActionContext
 import org.lettux.core.State
 
-class DefaultActionContext<STATE>(
+class DefaultActionContext<STATE : State>(
     override val action: Action,
     private val sendToStore: (ActionContext<State>) -> Unit,
     private val getState: () -> STATE,
@@ -12,6 +12,8 @@ class DefaultActionContext<STATE>(
 ) : ActionContext<STATE> {
 
     override val state get() = getState()
+
+    override fun commit(state: STATE) { setState(state) }
 
     override fun send(action: Action) {
         val innerActionContext = DefaultActionContext(
@@ -23,11 +25,9 @@ class DefaultActionContext<STATE>(
         sendToStore(innerActionContext)
     }
 
-    override fun commit(state: STATE) { setState(state) }
-
-    override fun <SLICE> slice(
+    override fun <SLICE : State> slice(
         stateToSlice: (STATE) -> SLICE,
-        sliceToState: (state: STATE, slice: SLICE) -> STATE,
+        sliceToState: (STATE, SLICE) -> STATE
     ): ActionContext<SLICE> {
         return DefaultActionContext(
             action = action,
