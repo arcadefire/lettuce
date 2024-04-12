@@ -9,11 +9,12 @@ import org.lettux.core.ActionHandler
 import org.lettux.core.Chain
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
+import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.core.StoreFactory
 import org.lettux.extension.defaultLaunch
 
-fun <STATE : Any> storeFactory(
+fun <STATE : State> storeFactory(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
@@ -25,7 +26,7 @@ fun <STATE : Any> storeFactory(
     )
 )
 
-fun <STATE : Any> defaultStoreFactory(
+fun <STATE : State> defaultStoreFactory(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
@@ -46,7 +47,7 @@ fun <STATE : Any> defaultStoreFactory(
 
             val newState = statesFlow.value
             if (oldState != newState) {
-                Outcome.StateMutated(newState as Any)
+                Outcome.StateMutated(newState)
             } else {
                 Outcome.NoMutation
             }
@@ -68,13 +69,13 @@ fun <STATE : Any> defaultStoreFactory(
                 getState = { statesFlow.value },
                 setState = { statesFlow.value = it },
             )
-            pipeline.proceed(actionContext as ActionContext<Any>)
+            pipeline.proceed(actionContext as ActionContext<State>)
         },
         storeScope = storeScope,
     )
 }
 
-class MemoizedStoreFactory<STATE : Any>(
+class MemoizedStoreFactory<STATE : State>(
     private val defaultFactory: StoreFactory<STATE>,
 ) : StoreFactory<STATE> {
 

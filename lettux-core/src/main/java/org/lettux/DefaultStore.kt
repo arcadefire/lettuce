@@ -8,11 +8,12 @@ import org.lettux.core.ActionContext
 import org.lettux.core.Chain
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
+import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.extension.defaultLaunch
 import org.lettux.slice.SlicedStatesFlow
 
-internal class DefaultStore<STATE>(
+internal class DefaultStore<STATE : State>(
     override val states: MutableStateFlow<STATE>,
     private val dispatch: suspend (Action) -> Outcome,
     private val storeScope: CoroutineScope,
@@ -20,7 +21,7 @@ internal class DefaultStore<STATE>(
 
     override fun send(action: Action): Job = storeScope.defaultLaunch { dispatch(action) }
 
-    override fun <SLICE : Any> slice(
+    override fun <SLICE : State> slice(
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware>,
@@ -49,7 +50,7 @@ internal class DefaultStore<STATE>(
                         storeScope.defaultLaunch { chain.proceed(it) }
                     },
                 )
-                chain.proceed(actionContext as ActionContext<Any>)
+                chain.proceed(actionContext as ActionContext<State>)
             },
         )
     }

@@ -7,10 +7,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.lettux.core.Action
 import org.lettux.core.Middleware
+import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.core.StoreFactory
 
-abstract class StoreViewModel<STATE : Any> constructor(
+abstract class StoreViewModel<STATE : State> constructor(
     private val storeFactory: StoreFactory<STATE>,
     private val subscription: Subscription<STATE>? = null,
 ) : Store<STATE>, ViewModel() {
@@ -29,7 +30,7 @@ abstract class StoreViewModel<STATE : Any> constructor(
 
     override fun send(action: Action) = store.send(action)
 
-    override fun <SLICE : Any> slice(
+    override fun <SLICE : State> slice(
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware>,
