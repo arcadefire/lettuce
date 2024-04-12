@@ -1,5 +1,6 @@
 package org.lettux.core
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.StateFlow
 
@@ -12,6 +13,7 @@ interface Store<STATE> {
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware> = emptyList(),
+        sliceScope: CoroutineScope,
     ): Store<SLICE>
 }
 

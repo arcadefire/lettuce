@@ -5,14 +5,22 @@ import org.lettux.core.ActionContext
 
 class DefaultActionContext<STATE>(
     override val action: Action,
+    private val sendToStore: (ActionContext<Any>) -> Unit,
     private val getState: () -> STATE,
     private val setState: (STATE) -> Unit,
-    private val sendToStore: (Action) -> Unit,
 ) : ActionContext<STATE> {
 
     override val state get() = getState()
 
-    override fun send(action: Action): STATE = state.also { sendToStore(action) }
+    override fun send(action: Action): STATE = state.also {
+        val innerActionContext = DefaultActionContext(
+            action = action,
+            sendToStore = sendToStore,
+            getState = getState,
+            setState = setState,
+        ) as ActionContext<Any>
+        sendToStore(innerActionContext)
+    }
 
     override fun commit(state: STATE): STATE = state.also { setState(it) }
 
