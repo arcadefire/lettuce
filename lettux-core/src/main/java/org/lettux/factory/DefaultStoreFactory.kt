@@ -2,10 +2,8 @@ package org.lettux.factory
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import org.lettux.DefaultActionContext
 import org.lettux.DefaultStore
-import org.lettux.core.Action
 import org.lettux.core.ActionContext
 import org.lettux.core.ActionHandler
 import org.lettux.core.Chain
@@ -34,24 +32,26 @@ fun <STATE : Any> defaultStoreFactory(
 ): StoreFactory<STATE> = StoreFactory { storeScope ->
     val statesFlow = MutableStateFlow(initialState)
 
-    val pipeline = middlewares.fold(Chain { actionContext ->
-        actionContext as ActionContext<STATE>
+    val pipeline = middlewares.fold(
+        Chain { actionContext ->
+            actionContext as ActionContext<STATE>
 
-        val oldState = statesFlow.value
+            val oldState = statesFlow.value
 
-        with(actionHandler) {
-            with(actionContext) {
-                handle()
+            with(actionHandler) {
+                with(actionContext) {
+                    handle()
+                }
+            }
+
+            val newState = statesFlow.value
+            if (oldState != newState) {
+                Outcome.StateMutated(newState as Any)
+            } else {
+                Outcome.NoMutation
             }
         }
-
-        val newState = statesFlow.value
-        if (oldState != newState) {
-            Outcome.StateMutated(newState as Any)
-        } else {
-            Outcome.NoMutation
-        }
-    }) { chain, middleware ->
+    ) { chain, middleware ->
         Chain { actionContext -> middleware.intercept(actionContext, chain) }
     }
 

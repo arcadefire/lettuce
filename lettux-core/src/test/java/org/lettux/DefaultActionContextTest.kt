@@ -1,7 +1,6 @@
 package org.lettux
 
 import io.kotest.matchers.shouldBe
-
 import org.junit.jupiter.api.Test
 import org.lettux.core.Action
 
@@ -23,7 +22,7 @@ internal class DefaultActionContextTest {
         )
 
         val slicedActionContext = actionContext.slice(
-            stateToSlice = { it.innerState},
+            stateToSlice = { it.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) }
         )
 
