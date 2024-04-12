@@ -12,7 +12,7 @@ class DefaultActionContext<STATE>(
 
     override val state get() = getState()
 
-    override fun send(action: Action): STATE = state.also {
+    override fun send(action: Action) {
         val innerActionContext = DefaultActionContext(
             action = action,
             sendToStore = sendToStore,
@@ -22,7 +22,7 @@ class DefaultActionContext<STATE>(
         sendToStore(innerActionContext)
     }
 
-    override fun commit(state: STATE): STATE = state.also { setState(it) }
+    override fun commit(state: STATE) { setState(state) }
 
     override fun <SLICE> slice(
         stateToSlice: (STATE) -> SLICE,
