@@ -5,50 +5,31 @@ import kotlinx.coroutines.flow.*
 import org.lettux.core.*
 import org.lettux.slice.SlicedStatesFlow
 
-fun <STATE : Any> createStore(
+fun interface StoreFactory<STATE : Any> {
+    fun create(
+        storeScope: CoroutineScope,
+    ): Store<STATE>
+}
+
+fun <STATE : Any> storeFactory(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
-    storeScope: CoroutineScope,
-): Store<STATE> = DefaultStore(
-    states = MutableStateFlow(initialState),
-    actionHandler = actionHandler,
-    storeScope = storeScope,
-    middlewares = middlewares,
-)
+): StoreFactory<STATE> = StoreFactory { storeScope ->
+    val statesFlow = MutableStateFlow(initialState)
+    val pipeline = middlewares.fold(Chain { actionContext ->
+        actionContext as ActionContext<STATE>
 
-internal class DefaultStore<STATE>(
-    override val states: MutableStateFlow<STATE>,
-    private val actionHandler: ActionHandler<STATE>,
-    private val storeScope: CoroutineScope,
-    middlewares: List<Middleware> = emptyList(),
-) : Store<STATE> {
+        val oldState = statesFlow.value
 
-    private class RecorderActionContext<STATE>(
-        private val actionContext: ActionContext<STATE>,
-    ) : ActionContext<STATE> by actionContext {
-
-        var modifiedState: STATE? = null
-
-        override fun commit(state: STATE): STATE {
-            modifiedState = state
-            return actionContext.commit(state)
-        }
-    }
-
-    private val middlewareChain: Chain = middlewares.fold(Chain { actionContext ->
-        val previousState = state
-        val recorder = RecorderActionContext(actionContext as ActionContext<STATE>)
-
-        with(recorder) {
-            with(actionHandler) {
+        with(actionHandler) {
+            with(actionContext) {
                 handle()
             }
         }
 
-        val newState = recorder.modifiedState ?: state
-        if (previousState != newState) {
-            setState(newState)
+        val newState = statesFlow.value
+        if (oldState != newState) {
             Outcome.StateMutated(newState as Any)
         } else {
             Outcome.NoMutation
@@ -57,20 +38,30 @@ internal class DefaultStore<STATE>(
         Chain { actionContext -> middleware.intercept(actionContext, chain) }
     }
 
-    @Synchronized
-    private fun setState(newState: STATE) {
-        states.value = newState
-    }
+    DefaultStore(
+        states = statesFlow,
+        dispatch = { action ->
+            val actionContext = DefaultActionContext(
+                action = action,
+                getState = { statesFlow.value },
+                setState = { statesFlow.value = it },
+                sendToStore = {},
+            )
+            pipeline.proceed(actionContext as ActionContext<Any>)
+        },
+        storeScope = storeScope,
+    )
+}
+
+internal class DefaultStore<STATE>(
+    override val states: MutableStateFlow<STATE>,
+    private val dispatch: suspend (Action) -> Outcome,
+    private val storeScope: CoroutineScope,
+) : Store<STATE> {
 
     override fun send(action: Action): Job {
-        val actionContext = DefaultActionContext(
-            action = action,
-            getState = { states.value },
-            setState = ::setState,
-            sendToStore = ::send,
-        )
         return storeScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            middlewareChain.proceed(actionContext as ActionContext<Any>)
+            dispatch(action)
         }
     }
 
@@ -81,17 +72,26 @@ internal class DefaultStore<STATE>(
     ): Store<SLICE> {
         return DefaultStore(
             states = SlicedStatesFlow(states, stateToSlice, sliceToState),
-            actionHandler = {
+            dispatch = { action ->
+                val bridgeChain = Chain {
+                    val parentOutcome = dispatch(action)
+                    if (parentOutcome is Outcome.StateMutated) {
+                        Outcome.StateMutated(stateToSlice(parentOutcome.state as STATE))
+                    } else {
+                        Outcome.NoMutation
+                    }
+                }
                 val actionContext = DefaultActionContext(
                     action = action,
                     getState = { states.value },
-                    setState = ::setState,
+                    setState = { states.value = it },
                     sendToStore = ::send,
                 )
-                middlewareChain.proceed(actionContext as ActionContext<Any>)
+                middlewares.fold(bridgeChain) { chain, middleware ->
+                    Chain { actionContext -> middleware.intercept(actionContext, chain) }
+                }.proceed(actionContext as ActionContext<Any>)
             },
             storeScope = storeScope,
-            middlewares = middlewares,
         )
     }
 }

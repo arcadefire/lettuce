@@ -4,16 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.lettux.core.ActionHandler
+import org.lettux.StoreFactory
+import org.lettux.core.Action
 import org.lettux.core.Middleware
 import org.lettux.core.Store
-import org.lettux.createStore
-import java.util.concurrent.Flow
 
 abstract class StoreViewModel<STATE : Any> constructor(
-    private val store: Store<STATE>,
+    private val storeFactory: StoreFactory<STATE>,
     private val subscription: Subscription<STATE>? = null,
-) : Store<STATE> by store, ViewModel() {
+) : Store<STATE>, ViewModel() {
+
+    private val store = storeFactory.create(viewModelScope)
 
     init {
         subscription?.let {
@@ -21,5 +22,21 @@ abstract class StoreViewModel<STATE : Any> constructor(
                 .onEach { send(it) }
                 .launchIn(viewModelScope)
         }
+    }
+
+    override val states = store.states
+
+    override fun send(action: Action) = store.send(action)
+
+    override fun <SLICE : Any> slice(
+        stateToSlice: (STATE) -> SLICE,
+        sliceToState: (STATE, SLICE) -> STATE,
+        middlewares: List<Middleware>
+    ): Store<SLICE> {
+        return store.slice(
+            stateToSlice = stateToSlice,
+            sliceToState = sliceToState,
+            middlewares = middlewares
+        )
     }
 }
