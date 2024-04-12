@@ -1,9 +1,10 @@
 package org.lettux.factory
 
 import org.lettux.core.Middleware
+import org.lettux.core.State
 import org.lettux.core.StoreFactory
 
-fun <STATE : Any, SLICE : Any> sliceStoreFactory(
+fun <STATE : State, SLICE : State> sliceStoreFactory(
     storeFactory: StoreFactory<STATE>,
     stateToSlice: (STATE) -> SLICE,
     sliceToState: (STATE, SLICE) -> STATE,

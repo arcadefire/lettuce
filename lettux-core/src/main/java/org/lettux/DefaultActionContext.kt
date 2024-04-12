@@ -2,10 +2,11 @@ package org.lettux
 
 import org.lettux.core.Action
 import org.lettux.core.ActionContext
+import org.lettux.core.State
 
 class DefaultActionContext<STATE>(
     override val action: Action,
-    private val sendToStore: (ActionContext<Any>) -> Unit,
+    private val sendToStore: (ActionContext<State>) -> Unit,
     private val getState: () -> STATE,
     private val setState: (STATE) -> Unit,
 ) : ActionContext<STATE> {
@@ -18,7 +19,7 @@ class DefaultActionContext<STATE>(
             sendToStore = sendToStore,
             getState = getState,
             setState = setState,
-        ) as ActionContext<Any>
+        ) as ActionContext<State>
         sendToStore(innerActionContext)
     }
 

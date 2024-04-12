@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.lettux.core.ActionHandler
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
-import org.lettux.core.state
+import org.lettux.extension.state
 import org.lettux.factory.storeFactory
 
 internal class DefaultStoreTest {

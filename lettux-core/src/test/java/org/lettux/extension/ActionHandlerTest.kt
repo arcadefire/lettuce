@@ -9,7 +9,6 @@ import org.lettux.NestedState
 import org.lettux.PlainState
 import org.lettux.core.Action
 import org.lettux.core.ActionHandler
-import org.lettux.core.state
 import org.lettux.factory.storeFactory
 
 internal class ActionHandlerTest {

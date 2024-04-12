@@ -3,24 +3,21 @@ package org.lettux.slice
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.lettux.core.Action
+import org.lettux.HandledAction
+import org.lettux.NestedState
+import org.lettux.PlainState
+import org.lettux.UnHandledAction
 import org.lettux.core.ActionHandler
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
 import org.lettux.core.Store
-import org.lettux.core.state
+import org.lettux.extension.state
 import org.lettux.factory.sliceStoreFactory
 import org.lettux.factory.storeFactory
 
 internal class SliceTest {
 
-    private object HandledAction : Action
-    private object UnHandledAction : Action
-
-    private data class InnerState(val value: Int = 0)
-    private data class ParentState(val innerState: InnerState = InnerState())
-
-    private val testActionHandler = ActionHandler<ParentState> {
+    private val testActionHandler = ActionHandler<NestedState> {
         if (action is HandledAction) {
             commit(
                 state.copy(
@@ -31,13 +28,13 @@ internal class SliceTest {
     }
 
     private val storeFactory = storeFactory(
-        initialState = ParentState(),
+        initialState = NestedState(),
         actionHandler = testActionHandler,
     )
 
     @Test
     fun `should slice from the parent store`() = runTest {
-        val sliced: Store<InnerState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStoreFactory(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) }
@@ -45,7 +42,7 @@ internal class SliceTest {
 
         sliced.send(HandledAction)
 
-        sliced.state shouldBe InnerState(value = 1)
+        sliced.state shouldBe PlainState(value = 1)
     }
 
     @Test
@@ -60,7 +57,7 @@ internal class SliceTest {
             chain.proceed(action)
         }
 
-        val sliced: Store<InnerState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStoreFactory(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -78,7 +75,7 @@ internal class SliceTest {
         val middleware = Middleware { action, chain ->
             chain.proceed(action).also { outcome = it }
         }
-        val sliced: Store<InnerState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStoreFactory(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -87,7 +84,7 @@ internal class SliceTest {
 
         sliced.send(HandledAction)
 
-        outcome shouldBe Outcome.StateMutated(InnerState(value = 1))
+        outcome shouldBe Outcome.StateMutated(PlainState(value = 1))
     }
 
     @Test
@@ -96,7 +93,7 @@ internal class SliceTest {
         val middleware = Middleware { action, chain ->
             chain.proceed(action).also { outcome = it }
         }
-        val sliced: Store<InnerState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStoreFactory(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
