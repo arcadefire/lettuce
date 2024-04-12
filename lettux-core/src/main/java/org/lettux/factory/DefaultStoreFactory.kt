@@ -58,6 +58,7 @@ fun <STATE : State> defaultStoreFactory(
 
     DefaultStore(
         states = statesFlow,
+        storeScope = storeScope,
         dispatch = { action ->
             val actionContext = DefaultActionContext(
                 action = action,
@@ -71,7 +72,6 @@ fun <STATE : State> defaultStoreFactory(
             )
             pipeline.proceed(actionContext as ActionContext<State>)
         },
-        storeScope = storeScope,
     )
 }
 
@@ -82,9 +82,11 @@ class MemoizedStoreFactory<STATE : State>(
     internal var memoizedStore: Store<STATE>? = null
 
     override fun get(storeScope: CoroutineScope): Store<STATE> {
-        if (memoizedStore == null) {
-            memoizedStore = defaultFactory.get(storeScope)
+        synchronized(this) {
+            if (memoizedStore == null) {
+                memoizedStore = defaultFactory.get(storeScope)
+            }
+            return memoizedStore!!
         }
-        return memoizedStore!!
     }
 }
