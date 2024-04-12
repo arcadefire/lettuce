@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.TestScope
 import org.lettux.core.*
 import org.junit.jupiter.api.Test
-import org.lettux.createStore
+import org.lettux.storeFactory
 
 internal class SliceTest {
 
@@ -24,11 +24,10 @@ internal class SliceTest {
         }
     }
 
-    private val store = createStore(
+    private val store = storeFactory(
         initialState = ParentState(),
         actionHandler = testActionHandler,
-        storeScope = TestScope(),
-    )
+    ).create(TestScope())
 
     @Test
     fun `should slice from the parent store`() {

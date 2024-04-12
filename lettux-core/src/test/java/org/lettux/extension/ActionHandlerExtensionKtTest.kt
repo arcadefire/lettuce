@@ -1,37 +1,35 @@
 package org.lettux.extension
 
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.test.TestScope
-
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import org.lettux.core.Action
+import org.lettux.HandledAction
+import org.lettux.InnerState
+import org.lettux.ParentState
+import org.lettux.TestState
 import org.lettux.core.ActionHandler
 import org.lettux.core.state
-import org.lettux.createStore
+import org.lettux.storeFactory
 
 internal class ActionHandlerExtensionKtTest {
 
-    private data object TestAction : Action
-
-    private data class InnerState(val value: Int = 0)
-    private data class ParentState(val innerState: InnerState = InnerState())
-
     @Test
     fun `pullback should transform an action handler of a sub-state into an action handler of the parent state`() {
-        val sliceActionHandler = ActionHandler<InnerState> {
-            commit(state.copy(value = state.value + 1))
+        runTest {
+            val sliceActionHandler = ActionHandler<InnerState> {
+                commit(state.copy(value = state.value + 1))
+            }
+            val store = storeFactory<ParentState>(
+                initialState = ParentState(InnerState()),
+                actionHandler = sliceActionHandler.pullback(
+                    stateToSlice = { it.innerState },
+                    sliceToState = { state, slice -> state.copy(innerState = slice) }
+                ),
+            ).create(storeScope = this)
+
+            store.send(HandledAction)
+
+            store.state shouldBe ParentState(InnerState(1))
         }
-        val store = createStore(
-            initialState = ParentState(InnerState(0)),
-            actionHandler = sliceActionHandler.pullback(
-                stateToSlice = { it.innerState },
-                sliceToState = { state, slice -> state.copy(innerState = slice) }
-            ),
-            storeScope = TestScope(),
-        )
-
-        store.send(TestAction)
-
-        store.state shouldBe ParentState(InnerState(1))
     }
 }

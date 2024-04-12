@@ -1,17 +1,11 @@
 package org.lettux
 
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.lettux.core.*
 import org.junit.jupiter.api.Test
 
 internal class DefaultStoreTest {
-
-    private object HandledAction : Action
-    private object UnHandledAction : Action
-
-    private data class TestState(val value: Int)
 
     private val testActionHandler = ActionHandler<TestState> {
         if (action is HandledAction) {
@@ -20,12 +14,11 @@ internal class DefaultStoreTest {
     }
 
     @Test
-    fun `should send an action to the store and mutate the state`() {
-        val store = createStore(
+    fun `should send an action to the store and mutate the state`() = runTest {
+        val store = storeFactory(
             initialState = TestState(value = 0),
             actionHandler = testActionHandler,
-            storeScope = TestScope(),
-        )
+        ).create(storeScope = this)
 
         store.send(HandledAction)
 
@@ -33,7 +26,7 @@ internal class DefaultStoreTest {
     }
 
     @Test
-    fun `middlewares should intercept the action once`() {
+    fun `middlewares should intercept the action once`() = runTest {
         var counter = 0
         val first = Middleware { action, chain ->
             counter++
@@ -43,12 +36,11 @@ internal class DefaultStoreTest {
             counter++
             chain.proceed(action)
         }
-        val store = createStore(
-            initialState = TestState(value = 0),
+        val store = storeFactory(
+            initialState = TestState(),
             actionHandler = testActionHandler,
-            storeScope = TestScope(),
-            middlewares = listOf(first, second),
-        )
+            middlewares = listOf(first, second)
+        ).create(storeScope = this)
 
         store.send(HandledAction)
 
@@ -61,12 +53,11 @@ internal class DefaultStoreTest {
         val middleware = Middleware { action, chain ->
             chain.proceed(action).also { outcome = it }
         }
-        val store = createStore(
-            initialState = TestState(value = 0),
+        val store = storeFactory(
+            initialState = TestState(),
             actionHandler = testActionHandler,
-            storeScope = TestScope(),
-            middlewares = listOf(middleware),
-        )
+            middlewares = listOf(middleware)
+        ).create(storeScope = this)
 
         store.send(HandledAction).join()
 
@@ -74,20 +65,20 @@ internal class DefaultStoreTest {
     }
 
     @Test
-    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() = runTest {
-        lateinit var outcome: Outcome
-        val middleware = Middleware { action, chain ->
-            chain.proceed(action).also { outcome = it }
+    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() =
+        runTest {
+            lateinit var outcome: Outcome
+            val middleware = Middleware { action, chain ->
+                chain.proceed(action).also { outcome = it }
+            }
+            val store = storeFactory(
+                initialState = TestState(),
+                actionHandler = testActionHandler,
+                middlewares = listOf(middleware)
+            ).create(storeScope = this)
+
+            store.send(UnHandledAction).join()
+
+            outcome shouldBe Outcome.NoMutation
         }
-        val store = createStore(
-            initialState = TestState(value = 0),
-            actionHandler = testActionHandler,
-            storeScope = TestScope(),
-            middlewares = listOf(middleware),
-        )
-
-        store.send(UnHandledAction).join()
-
-        outcome shouldBe Outcome.NoMutation
-    }
 }
