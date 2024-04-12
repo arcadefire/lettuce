@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.lettux.core.*
 import org.junit.jupiter.api.Test
+import org.lettux.factory.storeFactory
 
 internal class DefaultStoreTest {
 
@@ -18,7 +19,7 @@ internal class DefaultStoreTest {
         val store = storeFactory(
             initialState = TestState(value = 0),
             actionHandler = testActionHandler,
-        ).create(storeScope = this)
+        ).get(storeScope = this)
 
         store.send(HandledAction)
 
@@ -40,7 +41,7 @@ internal class DefaultStoreTest {
             initialState = TestState(),
             actionHandler = testActionHandler,
             middlewares = listOf(first, second)
-        ).create(storeScope = this)
+        ).get(storeScope = this)
 
         store.send(HandledAction)
 
@@ -57,7 +58,7 @@ internal class DefaultStoreTest {
             initialState = TestState(),
             actionHandler = testActionHandler,
             middlewares = listOf(middleware)
-        ).create(storeScope = this)
+        ).get(storeScope = this)
 
         store.send(HandledAction).join()
 
@@ -75,7 +76,7 @@ internal class DefaultStoreTest {
                 initialState = TestState(),
                 actionHandler = testActionHandler,
                 middlewares = listOf(middleware)
-            ).create(storeScope = this)
+            ).get(storeScope = this)
 
             store.send(UnHandledAction).join()
 
