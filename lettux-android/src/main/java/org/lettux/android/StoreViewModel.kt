@@ -10,21 +10,13 @@ import org.lettux.core.Middleware
 import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.core.StoreFactory
+import org.lettux.core.Subscription
 
 abstract class StoreViewModel<STATE : State> constructor(
     private val storeFactory: StoreFactory<STATE>,
-    private val subscription: Subscription<STATE>? = null,
 ) : Store<STATE>, ViewModel() {
 
     private val store = storeFactory.get(viewModelScope)
-
-    init {
-        subscription?.let {
-            subscription.subscribe(store.states)
-                .onEach { send(it) }
-                .launchIn(viewModelScope)
-        }
-    }
 
     override val states = store.states
 
@@ -34,12 +26,14 @@ abstract class StoreViewModel<STATE : State> constructor(
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware>,
+        subscription: Subscription<SLICE>?,
         sliceScope: CoroutineScope,
     ): Store<SLICE> {
         return store.slice(
             stateToSlice = stateToSlice,
             sliceToState = sliceToState,
             middlewares = middlewares,
+            subscription = subscription,
             sliceScope = sliceScope,
         )
     }

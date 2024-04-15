@@ -12,17 +12,20 @@ import org.lettux.core.Outcome
 import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.core.StoreFactory
+import org.lettux.core.Subscription
 import org.lettux.extension.defaultLaunch
 
 fun <STATE : State> storeFactory(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
+    subscription: Subscription<STATE>? = null,
 ) = MemoizedStoreFactory(
     defaultStoreFactory(
         initialState = initialState,
         actionHandler = actionHandler,
         middlewares = middlewares,
+        subscription = subscription,
     )
 )
 
@@ -30,6 +33,7 @@ fun <STATE : State> defaultStoreFactory(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
+    subscription: Subscription<STATE>? = null,
 ): StoreFactory<STATE> = StoreFactory { storeScope ->
     val statesFlow = MutableStateFlow(initialState)
 
@@ -59,6 +63,7 @@ fun <STATE : State> defaultStoreFactory(
     DefaultStore(
         states = statesFlow,
         storeScope = storeScope,
+        subscription = subscription,
         dispatch = { action ->
             val actionContext = DefaultActionContext(
                 action = action,

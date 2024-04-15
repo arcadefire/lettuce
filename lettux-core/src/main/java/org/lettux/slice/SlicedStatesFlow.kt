@@ -4,29 +4,29 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 
 internal class SlicedStatesFlow<SLICE, STATE>(
-    private val parent: MutableStateFlow<STATE>,
+    private val sourceFlow: MutableStateFlow<STATE>,
     private val stateToSlice: (STATE) -> SLICE,
     private val sliceToState: (STATE, SLICE) -> STATE,
-) : MutableStateFlow<SLICE> by MutableStateFlow(stateToSlice(parent.value)) {
+) : MutableStateFlow<SLICE> by MutableStateFlow(stateToSlice(sourceFlow.value)) {
 
     override val replayCache: List<SLICE>
-        get() = parent.replayCache.map(stateToSlice)
+        get() = sourceFlow.replayCache.map(stateToSlice)
 
     override var value: SLICE
-        get() = stateToSlice(parent.value)
+        get() = stateToSlice(sourceFlow.value)
         set(value) {
-            parent.value = sliceToState(parent.value, value)
+            sourceFlow.value = sliceToState(sourceFlow.value, value)
         }
 
-    override fun tryEmit(value: SLICE): Boolean = parent.tryEmit(
-        sliceToState(parent.value, value)
+    override fun tryEmit(value: SLICE): Boolean = sourceFlow.tryEmit(
+        sliceToState(sourceFlow.value, value)
     )
 
     override suspend fun emit(value: SLICE) {
-        parent.emit(sliceToState(parent.value, value))
+        sourceFlow.emit(sliceToState(sourceFlow.value, value))
     }
 
     override suspend fun collect(collector: FlowCollector<SLICE>): Nothing {
-        parent.collect { value -> collector.emit(stateToSlice(value)) }
+        sourceFlow.collect { value -> collector.emit(stateToSlice(value)) }
     }
 }
