@@ -53,7 +53,7 @@ internal class DefaultStore<STATE : State>(
                         Outcome.NoMutation
                     }
                 }
-                val chain = middlewares.fold(bridgeChain) { chain, middleware ->
+                val chain = middlewares.reversed().fold(bridgeChain) { chain, middleware ->
                     Chain { actionContext -> middleware.intercept(actionContext, chain) }
                 }
                 val actionContext = DefaultActionContext(

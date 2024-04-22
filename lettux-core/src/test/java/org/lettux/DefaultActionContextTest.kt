@@ -1,6 +1,7 @@
 package org.lettux
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Job
 import org.junit.jupiter.api.Test
 
 internal class DefaultActionContextTest {
@@ -12,7 +13,7 @@ internal class DefaultActionContextTest {
             action = HandledAction,
             getState = { parentState },
             setState = { parentState = it },
-            sendToStore = {},
+            sendToStore = { Job() },
         )
 
         val slicedActionContext = actionContext.slice(
