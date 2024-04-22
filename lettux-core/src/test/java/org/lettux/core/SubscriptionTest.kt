@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.lettux.HandledAction
 import org.lettux.PlainState
 import org.lettux.UnHandledAction
+import org.lettux.extension.combine
 import org.lettux.extension.state
 import org.lettux.factory.storeFactory
 
@@ -47,5 +48,59 @@ internal class SubscriptionTest {
         testScope.cancel()
 
         collectedStates shouldBe listOf(PlainState(value = 1), PlainState(value = 2))
+    }
+
+    @Test
+    fun `should combine two subscriptions in a single one`() {
+        val testScope = TestScope()
+        val callOrder = ArrayList<Int>(2)
+        val first = Subscription<PlainState> { states ->
+            states.map {
+                callOrder.add(1)
+                UnHandledAction
+            }
+        }
+        val second = Subscription<PlainState> { states ->
+            states.map {
+                callOrder.add(2)
+                UnHandledAction
+            }
+        }
+        val store = storeFactory(
+            initialState = PlainState(value = 0),
+            actionHandler = testActionHandler,
+            subscription = combine(first, second)
+        ).get(storeScope = testScope)
+
+        store.send(UnHandledAction)
+
+        testScope.advanceUntilIdle()
+        testScope.cancel()
+
+        callOrder shouldBe listOf(1, 2)
+    }
+
+    @Test
+    fun `combine with a single subscriber just returns the subscriber`() {
+        val testScope = TestScope()
+        var counter = 0
+        val first = Subscription<PlainState> { states ->
+            states.map {
+                counter++
+                UnHandledAction
+            }
+        }
+        val store = storeFactory(
+            initialState = PlainState(value = 0),
+            actionHandler = testActionHandler,
+            subscription = combine(first)
+        ).get(storeScope = testScope)
+
+        store.send(UnHandledAction)
+
+        testScope.advanceUntilIdle()
+        testScope.cancel()
+
+        counter shouldBe 1
     }
 }
