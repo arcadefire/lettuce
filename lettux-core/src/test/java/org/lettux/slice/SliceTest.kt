@@ -70,6 +70,29 @@ internal class SliceTest {
     }
 
     @Test
+    fun `middlewares should be executed in the order they are provided`() = runTest {
+        val callOrder = mutableListOf<Int>()
+        val first = Middleware { action, chain ->
+            callOrder.add(1)
+            chain.proceed(action)
+        }
+        val second = Middleware { action, chain ->
+            callOrder.add(2)
+            chain.proceed(action)
+        }
+        val sliced: Store<PlainState> = sliceStoreFactory(
+            storeFactory = storeFactory,
+            stateToSlice = { state -> state.innerState },
+            sliceToState = { state, slice -> state.copy(innerState = slice) },
+            middlewares = listOf(first, second),
+        ).get(this)
+
+        sliced.send(HandledAction)
+
+        callOrder shouldBe listOf(1, 2)
+    }
+
+    @Test
     fun `slice middleware should receive the expected outcome when the parent state changes`() = runTest {
         lateinit var outcome: Outcome
         val middleware = Middleware { action, chain ->

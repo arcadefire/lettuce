@@ -52,6 +52,28 @@ internal class DefaultStoreTest {
     }
 
     @Test
+    fun `middlewares should be executed in the order they are provided`() = runTest {
+        val callOrder = mutableListOf<Int>()
+        val first = Middleware { action, chain ->
+            callOrder.add(1)
+            chain.proceed(action)
+        }
+        val second = Middleware { action, chain ->
+            callOrder.add(2)
+            chain.proceed(action)
+        }
+        val store = storeFactory(
+            initialState = PlainState(),
+            actionHandler = testActionHandler,
+            middlewares = listOf(first, second)
+        ).get(storeScope = this)
+
+        store.send(HandledAction)
+
+        callOrder shouldBe listOf(1, 2)
+    }
+
+    @Test
     fun `a middleware should receive a mutated outcome when the state changed`() = runTest {
         lateinit var outcome: Outcome
         val middleware = Middleware { action, chain ->

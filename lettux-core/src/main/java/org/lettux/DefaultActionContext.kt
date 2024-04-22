@@ -1,12 +1,13 @@
 package org.lettux
 
+import kotlinx.coroutines.Job
 import org.lettux.core.Action
 import org.lettux.core.ActionContext
 import org.lettux.core.State
 
 class DefaultActionContext<STATE : State>(
     override val action: Action,
-    private val sendToStore: (ActionContext<State>) -> Unit,
+    private val sendToStore: (ActionContext<State>) -> Job,
     private val getState: () -> STATE,
     private val setState: (STATE) -> Unit,
 ) : ActionContext<STATE> {
@@ -15,14 +16,14 @@ class DefaultActionContext<STATE : State>(
 
     override fun commit(state: STATE) { setState(state) }
 
-    override fun send(action: Action) {
+    override fun send(action: Action) : Job {
         val innerActionContext = DefaultActionContext(
             action = action,
             sendToStore = sendToStore,
             getState = getState,
             setState = setState,
         ) as ActionContext<State>
-        sendToStore(innerActionContext)
+        return sendToStore(innerActionContext)
     }
 
     override fun <SLICE : State> slice(

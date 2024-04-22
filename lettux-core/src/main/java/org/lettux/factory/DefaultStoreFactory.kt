@@ -36,29 +36,29 @@ fun <STATE : State> defaultStoreFactory(
     subscription: Subscription<STATE>? = null,
 ): StoreFactory<STATE> = StoreFactory { storeScope ->
     val statesFlow = MutableStateFlow(initialState)
+    val pipeline = middlewares
+        .reversed()
+        .fold(
+            Chain { actionContext ->
+                actionContext as ActionContext<STATE>
 
-    val pipeline = middlewares.fold(
-        Chain { actionContext ->
-            actionContext as ActionContext<STATE>
+                val oldState = statesFlow.value
+                with(actionHandler) {
+                    with(actionContext) {
+                        handle()
+                    }
+                }
 
-            val oldState = statesFlow.value
-
-            with(actionHandler) {
-                with(actionContext) {
-                    handle()
+                val newState = statesFlow.value
+                if (oldState != newState) {
+                    Outcome.StateMutated(newState)
+                } else {
+                    Outcome.NoMutation
                 }
             }
-
-            val newState = statesFlow.value
-            if (oldState != newState) {
-                Outcome.StateMutated(newState)
-            } else {
-                Outcome.NoMutation
-            }
+        ) { chain, middleware ->
+            Chain { actionContext -> middleware.intercept(actionContext, chain) }
         }
-    ) { chain, middleware ->
-        Chain { actionContext -> middleware.intercept(actionContext, chain) }
-    }
 
     DefaultStore(
         states = statesFlow,
