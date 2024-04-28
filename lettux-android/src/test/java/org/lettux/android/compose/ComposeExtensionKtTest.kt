@@ -2,17 +2,10 @@ package org.lettux.android.compose
 
 import android.app.Application
 import android.content.pm.ActivityInfo
-import android.media.Image.Plane
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -20,10 +13,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runner.RunWith
-import org.lettux.core.Action
 import org.lettux.core.State
-import org.lettux.core.Store
-import org.lettux.extension.state
 import org.lettux.factory.storeFactory
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf

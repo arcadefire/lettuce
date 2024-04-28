@@ -9,22 +9,22 @@ plugins {
     `maven-publish`
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    autoCorrect = true
-    config.setFrom("$projectDir/config/detekt.yml")
-}
-
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = "1.8"
-}
-tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "1.8"
-}
-
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    detekt {
+        buildUponDefaultConfig = true
+        allRules = false
+        autoCorrect = true
+        config.setFrom("$rootDir/config/detekt.yml")
+    }
+
+    tasks.withType<Detekt>().configureEach {
+        jvmTarget = "1.8"
+    }
+    tasks.withType<DetektCreateBaselineTask>().configureEach {
+        jvmTarget = "1.8"
+    }
 
     dependencies {
         detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.6")

@@ -3,8 +3,6 @@ package org.lettux.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import org.lettux.core.Action
 import org.lettux.core.Middleware
 import org.lettux.core.State

@@ -2,12 +2,10 @@ package org.lettux.core
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.lettux.HandledAction
 import org.lettux.PlainState
