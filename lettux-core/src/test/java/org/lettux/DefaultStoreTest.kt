@@ -91,20 +91,19 @@ internal class DefaultStoreTest {
     }
 
     @Test
-    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() =
-        runTest {
-            lateinit var outcome: Outcome
-            val middleware = Middleware { action, chain ->
-                chain.proceed(action).also { outcome = it }
-            }
-            val store = storeFactory(
-                initialState = PlainState(),
-                actionHandler = testActionHandler,
-                middlewares = listOf(middleware)
-            ).get(storeScope = this)
-
-            store.send(UnHandledAction).join()
-
-            outcome shouldBe Outcome.NoMutation
+    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() = runTest {
+        lateinit var outcome: Outcome
+        val middleware = Middleware { action, chain ->
+            chain.proceed(action).also { outcome = it }
         }
+        val store = storeFactory(
+            initialState = PlainState(),
+            actionHandler = testActionHandler,
+            middlewares = listOf(middleware)
+        ).get(storeScope = this)
+
+        store.send(UnHandledAction).join()
+
+        outcome shouldBe Outcome.NoMutation
+    }
 }

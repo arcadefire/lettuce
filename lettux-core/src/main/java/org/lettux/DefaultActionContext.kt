@@ -16,7 +16,7 @@ class DefaultActionContext<STATE : State>(
 
     override fun commit(state: STATE) { setState(state) }
 
-    override fun send(action: Action) : Job {
+    override fun send(action: Action): Job {
         val innerActionContext = DefaultActionContext(
             action = action,
             sendToStore = sendToStore,
