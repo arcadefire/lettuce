@@ -4,16 +4,15 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Job
 import org.junit.jupiter.api.Test
 
-internal class DefaultActionContextTest {
+internal class DefaultActionHandlerContextTest {
 
     @Test
     fun `sliced action context should update the parent state as expected`() {
         var parentState = NestedState(PlainState())
-        val actionContext = DefaultActionContext(
-            action = HandledAction,
+        val actionContext = DefaultActionHandlerContext(
             getState = { parentState },
             setState = { parentState = it },
-            sendToStore = { Job() },
+            sendFunction = { Job() },
         )
 
         val slicedActionContext = actionContext.slice(

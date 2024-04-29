@@ -24,14 +24,12 @@ abstract class StoreViewModel<STATE : State> constructor(
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware>,
-        subscription: Subscription<SLICE>?,
         sliceScope: CoroutineScope,
     ): Store<SLICE> {
         return store.slice(
             stateToSlice = stateToSlice,
             sliceToState = sliceToState,
             middlewares = middlewares,
-            subscription = subscription,
             sliceScope = sliceScope,
         )
     }
