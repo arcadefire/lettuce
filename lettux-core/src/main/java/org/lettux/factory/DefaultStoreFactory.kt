@@ -2,9 +2,10 @@ package org.lettux.factory
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.lettux.DefaultActionContext
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import org.lettux.DefaultActionHandlerContext
 import org.lettux.DefaultStore
-import org.lettux.core.ActionContext
 import org.lettux.core.ActionHandler
 import org.lettux.core.Chain
 import org.lettux.core.Middleware
@@ -13,7 +14,6 @@ import org.lettux.core.State
 import org.lettux.core.Store
 import org.lettux.core.StoreFactory
 import org.lettux.core.Subscription
-import org.lettux.extension.defaultLaunch
 
 fun <STATE : State> storeFactory(
     initialState: STATE,
@@ -35,17 +35,23 @@ fun <STATE : State> defaultStoreFactory(
     middlewares: List<Middleware> = emptyList(),
     subscription: Subscription<STATE>? = null,
 ): StoreFactory<STATE> = StoreFactory { storeScope ->
+    lateinit var store: Store<STATE>
+
     val statesFlow = MutableStateFlow(initialState)
     val pipeline = middlewares
         .reversed()
         .fold(
-            Chain { actionContext ->
-                actionContext as ActionContext<STATE>
-
+            Chain { action ->
+                val actionContext = DefaultActionHandlerContext(
+                    sendFunction = store::send,
+                    getState = { statesFlow.value },
+                    setState = { statesFlow.value = it },
+                )
                 val oldState = statesFlow.value
+
                 with(actionHandler) {
                     with(actionContext) {
-                        handle()
+                        handle(action)
                     }
                 }
 
@@ -57,27 +63,22 @@ fun <STATE : State> defaultStoreFactory(
                 }
             }
         ) { chain, middleware ->
-            Chain { actionContext -> middleware.intercept(actionContext, chain) }
+            Chain { action -> middleware.intercept(action, statesFlow.value, chain) }
         }
+
+    subscription?.apply {
+        subscribe(statesFlow)
+            .onEach(pipeline::proceed)
+            .launchIn(storeScope)
+    }
 
     DefaultStore(
         states = statesFlow,
         storeScope = storeScope,
-        subscription = subscription,
-        dispatch = { action ->
-            val actionContext = DefaultActionContext(
-                action = action,
-                sendToStore = { innerActionContext ->
-                    storeScope.defaultLaunch {
-                        pipeline.proceed(innerActionContext)
-                    }
-                },
-                getState = { statesFlow.value },
-                setState = { statesFlow.value = it },
-            )
-            pipeline.proceed(actionContext as ActionContext<State>)
-        },
-    )
+        doSend = { action -> pipeline.proceed(action) },
+    ).also {
+        store = it
+    }
 }
 
 class MemoizedStoreFactory<STATE : State>(

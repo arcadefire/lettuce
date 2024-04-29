@@ -11,7 +11,7 @@ import org.lettux.factory.storeFactory
 
 internal class DefaultStoreTest {
 
-    private val testActionHandler = ActionHandler<PlainState> {
+    private val testActionHandler = ActionHandler<PlainState> { action ->
         if (action is HandledAction) {
             commit(state.copy(value = state.value + 1))
         }
@@ -32,11 +32,11 @@ internal class DefaultStoreTest {
     @Test
     fun `middlewares should intercept the action once`() = runTest {
         var counter = 0
-        val first = Middleware { action, chain ->
+        val first = Middleware { action, _, chain ->
             counter++
             chain.proceed(action)
         }
-        val second = Middleware { action, chain ->
+        val second = Middleware { action, _, chain ->
             counter++
             chain.proceed(action)
         }
@@ -54,11 +54,11 @@ internal class DefaultStoreTest {
     @Test
     fun `middlewares should be executed in the order they are provided`() = runTest {
         val callOrder = mutableListOf<Int>()
-        val first = Middleware { action, chain ->
+        val first = Middleware { action, _, chain ->
             callOrder.add(1)
             chain.proceed(action)
         }
-        val second = Middleware { action, chain ->
+        val second = Middleware { action, _, chain ->
             callOrder.add(2)
             chain.proceed(action)
         }
@@ -76,7 +76,7 @@ internal class DefaultStoreTest {
     @Test
     fun `a middleware should receive a mutated outcome when the state changed`() = runTest {
         lateinit var outcome: Outcome
-        val middleware = Middleware { action, chain ->
+        val middleware = Middleware { action, _, chain ->
             chain.proceed(action).also { outcome = it }
         }
         val store = storeFactory(
@@ -91,19 +91,20 @@ internal class DefaultStoreTest {
     }
 
     @Test
-    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() = runTest {
-        lateinit var outcome: Outcome
-        val middleware = Middleware { action, chain ->
-            chain.proceed(action).also { outcome = it }
+    fun `a middleware should receive a no-mutation outcome when the state hasn't changed`() =
+        runTest {
+            lateinit var outcome: Outcome
+            val middleware = Middleware { action, _, chain ->
+                chain.proceed(action).also { outcome = it }
+            }
+            val store = storeFactory(
+                initialState = PlainState(),
+                actionHandler = testActionHandler,
+                middlewares = listOf(middleware)
+            ).get(storeScope = this)
+
+            store.send(UnHandledAction).join()
+
+            outcome shouldBe Outcome.NoMutation
         }
-        val store = storeFactory(
-            initialState = PlainState(),
-            actionHandler = testActionHandler,
-            middlewares = listOf(middleware)
-        ).get(storeScope = this)
-
-        store.send(UnHandledAction).join()
-
-        outcome shouldBe Outcome.NoMutation
-    }
 }

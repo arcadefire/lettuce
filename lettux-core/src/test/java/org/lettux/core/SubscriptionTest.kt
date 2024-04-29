@@ -16,7 +16,7 @@ import org.lettux.factory.storeFactory
 
 internal class SubscriptionTest {
 
-    private val testActionHandler = ActionHandler<PlainState> {
+    private val testActionHandler = ActionHandler<PlainState> { action ->
         if (action is HandledAction) {
             commit(state.copy(value = state.value + 1))
         }

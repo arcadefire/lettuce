@@ -7,12 +7,14 @@ fun <STATE : State, SLICE : State> ActionHandler<SLICE>.pullback(
     stateToSlice: (STATE) -> SLICE,
     sliceToState: (STATE, SLICE) -> STATE
 ): ActionHandler<STATE> {
-    return ActionHandler { slice(stateToSlice, sliceToState).handle() }
+    return ActionHandler { action ->
+        val actionContext = slice(stateToSlice, sliceToState)
+        with(actionContext) { handle(action) }
+    }
 }
 
 fun <STATE : State> combine(vararg handlers: ActionHandler<STATE>): ActionHandler<STATE> {
     return ActionHandler {
-        val actionContext = this
-        handlers.forEach { handler -> with(handler) { actionContext.handle() } }
+        handlers.forEach { handler -> with(handler) { handle(it) } }
     }
 }

@@ -36,7 +36,7 @@ internal class ActionHandlerTest {
     @Test
     fun `should send an action to the same store from within the handle function`() {
         runTest {
-            val actionHandler = ActionHandler<NestedState> {
+            val actionHandler = ActionHandler<NestedState> { action ->
                 when (action) {
                     FirstAction -> send(SecondAction)
                     SecondAction -> {

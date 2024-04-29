@@ -40,7 +40,6 @@ interface Store<STATE : State> {
         stateToSlice: (STATE) -> SLICE,
         sliceToState: (STATE, SLICE) -> STATE,
         middlewares: List<Middleware> = emptyList(),
-        subscription: Subscription<SLICE>? = null,
         sliceScope: CoroutineScope,
     ): Store<SLICE>
 }

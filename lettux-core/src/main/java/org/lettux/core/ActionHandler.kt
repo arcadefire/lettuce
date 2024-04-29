@@ -1,5 +1,6 @@
 package org.lettux.core
 
-fun interface ActionHandler<STATE : State> {
-    suspend fun ActionContext<STATE>.handle()
+fun interface ActionHandler<S : State> {
+    context(ActionHandlerContext<S>)
+    suspend fun handle(action: Action)
 }

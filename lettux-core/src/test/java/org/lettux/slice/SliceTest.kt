@@ -17,7 +17,7 @@ import org.lettux.factory.storeFactory
 
 internal class SliceTest {
 
-    private val testActionHandler = ActionHandler<NestedState> {
+    private val testActionHandler = ActionHandler<NestedState> { action ->
         if (action is HandledAction) {
             commit(
                 state.copy(
@@ -48,11 +48,11 @@ internal class SliceTest {
     @Test
     fun `slice middlewares should intercept the action once`() = runTest {
         var counter = 0
-        val first = Middleware { action, chain ->
+        val first = Middleware { action, _, chain ->
             counter++
             chain.proceed(action)
         }
-        val second = Middleware { action, chain ->
+        val second = Middleware { action, _, chain ->
             counter++
             chain.proceed(action)
         }
@@ -72,11 +72,11 @@ internal class SliceTest {
     @Test
     fun `middlewares should be executed in the order they are provided`() = runTest {
         val callOrder = mutableListOf<Int>()
-        val first = Middleware { action, chain ->
+        val first = Middleware { action, _, chain ->
             callOrder.add(1)
             chain.proceed(action)
         }
-        val second = Middleware { action, chain ->
+        val second = Middleware { action, _, chain ->
             callOrder.add(2)
             chain.proceed(action)
         }
@@ -93,38 +93,40 @@ internal class SliceTest {
     }
 
     @Test
-    fun `slice middleware should receive the expected outcome when the parent state changes`() = runTest {
-        lateinit var outcome: Outcome
-        val middleware = Middleware { action, chain ->
-            chain.proceed(action).also { outcome = it }
+    fun `slice middleware should receive the expected outcome when the parent state changes`() =
+        runTest {
+            lateinit var outcome: Outcome
+            val middleware = Middleware { action, _, chain ->
+                chain.proceed(action).also { outcome = it }
+            }
+            val sliced: Store<PlainState> = sliceStoreFactory(
+                storeFactory = storeFactory,
+                stateToSlice = { state -> state.innerState },
+                sliceToState = { state, slice -> state.copy(innerState = slice) },
+                middlewares = listOf(middleware),
+            ).get(this)
+
+            sliced.send(HandledAction)
+
+            outcome shouldBe Outcome.StateMutated(PlainState(value = 1))
         }
-        val sliced: Store<PlainState> = sliceStoreFactory(
-            storeFactory = storeFactory,
-            stateToSlice = { state -> state.innerState },
-            sliceToState = { state, slice -> state.copy(innerState = slice) },
-            middlewares = listOf(middleware),
-        ).get(this)
-
-        sliced.send(HandledAction)
-
-        outcome shouldBe Outcome.StateMutated(PlainState(value = 1))
-    }
 
     @Test
-    fun `slice middleware should receive the expected outcome when the parent state doesn't change`() = runTest {
-        lateinit var outcome: Outcome
-        val middleware = Middleware { action, chain ->
-            chain.proceed(action).also { outcome = it }
+    fun `slice middleware should receive the expected outcome when the parent state doesn't change`() =
+        runTest {
+            lateinit var outcome: Outcome
+            val middleware = Middleware { action, _, chain ->
+                chain.proceed(action).also { outcome = it }
+            }
+            val sliced: Store<PlainState> = sliceStoreFactory(
+                storeFactory = storeFactory,
+                stateToSlice = { state -> state.innerState },
+                sliceToState = { state, slice -> state.copy(innerState = slice) },
+                middlewares = listOf(middleware),
+            ).get(this)
+
+            sliced.send(UnHandledAction)
+
+            outcome shouldBe Outcome.NoMutation
         }
-        val sliced: Store<PlainState> = sliceStoreFactory(
-            storeFactory = storeFactory,
-            stateToSlice = { state -> state.innerState },
-            sliceToState = { state, slice -> state.copy(innerState = slice) },
-            middlewares = listOf(middleware),
-        ).get(this)
-
-        sliced.send(UnHandledAction)
-
-        outcome shouldBe Outcome.NoMutation
-    }
 }

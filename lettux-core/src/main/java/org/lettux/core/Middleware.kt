@@ -1,7 +1,7 @@
 package org.lettux.core
 
 fun interface Middleware {
-    suspend fun intercept(action: ActionContext<State>, chain: Chain): Outcome
+    suspend fun intercept(action: Action, state: State, chain: Chain): Outcome
 }
 
 sealed class Outcome {
@@ -10,5 +10,5 @@ sealed class Outcome {
 }
 
 fun interface Chain {
-    suspend fun proceed(actionContext: ActionContext<State>): Outcome
+    suspend fun proceed(action: Action): Outcome
 }
