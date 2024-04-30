@@ -7,6 +7,7 @@ plugins {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
+        jvmTarget = "17"
         freeCompilerArgs = listOf("-Xcontext-receivers", "-Xopt-in=kotlin.Experimental")
     }
 }

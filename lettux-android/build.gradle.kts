@@ -22,8 +22,7 @@ android {
         }
     }
 
-    val javaVersion = JavaVersion.VERSION_17
-
+    val javaVersion = JavaVersion.VERSION_11
     compileOptions {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
@@ -38,13 +37,12 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = javaVersion.toString()
     }
 
     publishing {
         singleVariant("debug") {
             withSourcesJar()
-            withJavadocJar()
         }
         version = project.version.toString()
         group = project.group.toString()
@@ -72,6 +70,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
     testImplementation("org.robolectric:robolectric:4.12.1")
     testImplementation("androidx.compose.ui:ui-test-junit4:1.6.6")
+    testImplementation("io.mockk:mockk:1.13.8")
+
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.6")
 }
 
