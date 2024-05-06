@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "lettux"
 include("lettux-android")
 include("lettux-core")
+include(":lettux-processor")
