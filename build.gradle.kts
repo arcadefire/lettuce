@@ -3,8 +3,9 @@ import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 
 plugins {
     id("com.android.library") version "8.3.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.23" apply false
-    id("org.jetbrains.kotlin.jvm") version "1.9.23" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.0" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.0.0" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
     `maven-publish`
 }

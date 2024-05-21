@@ -7,9 +7,9 @@ import org.lettux.core.Action
 import org.lettux.core.Chain
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
+import org.lettux.core.SliceableStore
 import org.lettux.core.State
 import org.lettux.core.Store
-import org.lettux.core.Subscription
 import org.lettux.extension.defaultLaunch
 import org.lettux.extension.state
 import org.lettux.slice.SlicedStatesFlow
@@ -18,7 +18,7 @@ internal class DefaultStore<STATE : State>(
     override val states: MutableStateFlow<STATE>,
     private val doSend: suspend (Action) -> Outcome,
     private val storeScope: CoroutineScope,
-) : Store<STATE> {
+) : Store<STATE>, SliceableStore<STATE> {
 
     override fun send(action: Action): Job = storeScope.defaultLaunch { doSend(action) }
 

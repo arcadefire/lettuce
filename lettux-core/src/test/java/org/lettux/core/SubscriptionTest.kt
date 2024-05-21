@@ -11,8 +11,7 @@ import org.lettux.HandledAction
 import org.lettux.PlainState
 import org.lettux.UnHandledAction
 import org.lettux.extension.combine
-import org.lettux.extension.state
-import org.lettux.factory.storeFactory
+import org.lettux.factory.createStore
 
 internal class SubscriptionTest {
 
@@ -26,7 +25,7 @@ internal class SubscriptionTest {
     fun `should subscribe to state changes`() {
         val collectedStates = ArrayList<PlainState>(2)
         val testScope = TestScope()
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(value = 0),
             actionHandler = testActionHandler,
             subscription = { states ->
@@ -64,7 +63,7 @@ internal class SubscriptionTest {
                 UnHandledAction
             }
         }
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(value = 0),
             actionHandler = testActionHandler,
             subscription = combine(first, second)
@@ -88,7 +87,7 @@ internal class SubscriptionTest {
                 UnHandledAction
             }
         }
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(value = 0),
             actionHandler = testActionHandler,
             subscription = combine(first)

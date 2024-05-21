@@ -9,7 +9,7 @@ import org.lettux.NestedState
 import org.lettux.PlainState
 import org.lettux.core.Action
 import org.lettux.core.ActionHandler
-import org.lettux.factory.storeFactory
+import org.lettux.factory.createStore
 
 internal class ActionHandlerTest {
 
@@ -19,7 +19,7 @@ internal class ActionHandlerTest {
             val sliceActionHandler = ActionHandler<PlainState> {
                 commit(state.copy(value = state.value + 1))
             }
-            val store = storeFactory<NestedState>(
+            val store = createStore<NestedState>(
                 initialState = NestedState(PlainState()),
                 actionHandler = sliceActionHandler.pullback(
                     stateToSlice = { it.innerState },
@@ -44,7 +44,7 @@ internal class ActionHandlerTest {
                     }
                 }
             }
-            val store = storeFactory(
+            val store = createStore(
                 initialState = NestedState(PlainState()),
                 actionHandler = actionHandler
             ).get(storeScope = this)

@@ -1,6 +1,10 @@
 package org.lettux.slice
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.lettux.HandledAction
@@ -11,9 +15,10 @@ import org.lettux.core.ActionHandler
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
 import org.lettux.core.Store
+import org.lettux.core.Subscription
 import org.lettux.extension.state
-import org.lettux.factory.sliceStoreFactory
-import org.lettux.factory.storeFactory
+import org.lettux.factory.sliceStore
+import org.lettux.factory.createStore
 
 internal class SliceTest {
 
@@ -27,14 +32,14 @@ internal class SliceTest {
         }
     }
 
-    private val storeFactory = storeFactory(
+    private val storeFactory = createStore(
         initialState = NestedState(),
         actionHandler = testActionHandler,
     )
 
     @Test
     fun `should slice from the parent store`() = runTest {
-        val sliced: Store<PlainState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStore(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) }
@@ -57,7 +62,7 @@ internal class SliceTest {
             chain.proceed(action)
         }
 
-        val sliced: Store<PlainState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStore(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -80,7 +85,7 @@ internal class SliceTest {
             callOrder.add(2)
             chain.proceed(action)
         }
-        val sliced: Store<PlainState> = sliceStoreFactory(
+        val sliced: Store<PlainState> = sliceStore(
             storeFactory = storeFactory,
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -99,7 +104,7 @@ internal class SliceTest {
             val middleware = Middleware { action, _, chain ->
                 chain.proceed(action).also { outcome = it }
             }
-            val sliced: Store<PlainState> = sliceStoreFactory(
+            val sliced: Store<PlainState> = sliceStore(
                 storeFactory = storeFactory,
                 stateToSlice = { state -> state.innerState },
                 sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -118,7 +123,7 @@ internal class SliceTest {
             val middleware = Middleware { action, _, chain ->
                 chain.proceed(action).also { outcome = it }
             }
-            val sliced: Store<PlainState> = sliceStoreFactory(
+            val sliced: Store<PlainState> = sliceStore(
                 storeFactory = storeFactory,
                 stateToSlice = { state -> state.innerState },
                 sliceToState = { state, slice -> state.copy(innerState = slice) },
@@ -128,5 +133,29 @@ internal class SliceTest {
             sliced.send(UnHandledAction)
 
             outcome shouldBe Outcome.NoMutation
+        }
+
+    @Test
+    fun `slice subscription should receive the expected sliced state`() =
+        runTest {
+            lateinit var subscribedState: PlainState
+            val subscription = Subscription { states ->
+                states
+                    .onEach { subscribedState = it }
+                    .map { UnHandledAction }
+                    .take(1)
+            }
+            val sliced: Store<PlainState> = sliceStore(
+                storeFactory = storeFactory,
+                stateToSlice = { state -> state.innerState },
+                sliceToState = { state, slice -> state.copy(innerState = slice) },
+                subscription = subscription,
+            ).get(this)
+
+            sliced.send(HandledAction)
+
+            advanceUntilIdle()
+
+            subscribedState shouldBe PlainState(value = 1)
         }
 }

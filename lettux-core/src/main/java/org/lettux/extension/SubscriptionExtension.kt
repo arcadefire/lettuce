@@ -17,3 +17,7 @@ fun <STATE : State> combine(vararg subscriptions: Subscription<STATE>): Subscrip
         }
     }
 }
+
+operator fun <S : State> Subscription<S>.plus(another: Subscription<S>): Subscription<S> {
+    return combine(this, another)
+}

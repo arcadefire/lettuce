@@ -15,7 +15,7 @@ import org.lettux.core.Store
 import org.lettux.core.StoreFactory
 import org.lettux.core.Subscription
 
-fun <STATE : State> storeFactory(
+fun <STATE : State> createStore(
     initialState: STATE,
     actionHandler: ActionHandler<STATE>,
     middlewares: List<Middleware> = emptyList(),
@@ -66,18 +66,18 @@ fun <STATE : State> defaultStoreFactory(
             Chain { action -> middleware.intercept(action, statesFlow.value, chain) }
         }
 
-    subscription?.apply {
-        subscribe(statesFlow)
-            .onEach(pipeline::proceed)
-            .launchIn(storeScope)
-    }
-
     DefaultStore(
         states = statesFlow,
         storeScope = storeScope,
         doSend = { action -> pipeline.proceed(action) },
     ).also {
         store = it
+
+        subscription?.apply {
+            subscribe(store.states)
+                .onEach(store::send)
+                .launchIn(storeScope)
+        }
     }
 }
 

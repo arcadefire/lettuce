@@ -19,18 +19,4 @@ abstract class StoreViewModel<STATE : State> constructor(
     override val states = store.states
 
     override fun send(action: Action) = store.send(action)
-
-    override fun <SLICE : State> slice(
-        stateToSlice: (STATE) -> SLICE,
-        sliceToState: (STATE, SLICE) -> STATE,
-        middlewares: List<Middleware>,
-        sliceScope: CoroutineScope,
-    ): Store<SLICE> {
-        return store.slice(
-            stateToSlice = stateToSlice,
-            sliceToState = sliceToState,
-            middlewares = middlewares,
-            sliceScope = sliceScope,
-        )
-    }
 }

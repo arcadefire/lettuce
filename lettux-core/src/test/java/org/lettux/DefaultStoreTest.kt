@@ -7,7 +7,7 @@ import org.lettux.core.ActionHandler
 import org.lettux.core.Middleware
 import org.lettux.core.Outcome
 import org.lettux.extension.state
-import org.lettux.factory.storeFactory
+import org.lettux.factory.createStore
 
 internal class DefaultStoreTest {
 
@@ -19,7 +19,7 @@ internal class DefaultStoreTest {
 
     @Test
     fun `should send an action to the store and mutate the state`() = runTest {
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(value = 0),
             actionHandler = testActionHandler,
         ).get(storeScope = this)
@@ -40,7 +40,7 @@ internal class DefaultStoreTest {
             counter++
             chain.proceed(action)
         }
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(),
             actionHandler = testActionHandler,
             middlewares = listOf(first, second)
@@ -62,7 +62,7 @@ internal class DefaultStoreTest {
             callOrder.add(2)
             chain.proceed(action)
         }
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(),
             actionHandler = testActionHandler,
             middlewares = listOf(first, second)
@@ -79,7 +79,7 @@ internal class DefaultStoreTest {
         val middleware = Middleware { action, _, chain ->
             chain.proceed(action).also { outcome = it }
         }
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(),
             actionHandler = testActionHandler,
             middlewares = listOf(middleware)
@@ -97,7 +97,7 @@ internal class DefaultStoreTest {
             val middleware = Middleware { action, _, chain ->
                 chain.proceed(action).also { outcome = it }
             }
-            val store = storeFactory(
+            val store = createStore(
                 initialState = PlainState(),
                 actionHandler = testActionHandler,
                 middlewares = listOf(middleware)

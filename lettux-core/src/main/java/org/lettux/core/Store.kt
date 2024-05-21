@@ -32,7 +32,9 @@ interface Store<STATE : State> {
      * [Job] representing the coroutine in which the action is processed.
      */
     fun send(action: Action): Job
+}
 
+internal interface SliceableStore<STATE : State> {
     /**
      * Creates a slice of the store's state.
      */

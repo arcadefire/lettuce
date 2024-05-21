@@ -14,7 +14,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.lettux.core.State
-import org.lettux.factory.storeFactory
+import org.lettux.factory.createStore
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
@@ -43,7 +43,7 @@ class ComposeExtensionKtTest {
 
     @Test
     fun `currentStore should retrieve the store of the expected state`() = runTest {
-        val store = storeFactory(
+        val store = createStore(
             initialState = PlainState(),
             actionHandler = { },
         ).get(this)
