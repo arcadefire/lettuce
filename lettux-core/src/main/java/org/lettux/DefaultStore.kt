@@ -9,6 +9,7 @@ import org.lettux.core.Middleware
 import org.lettux.core.Outcome
 import org.lettux.core.State
 import org.lettux.core.Store
+import org.lettux.core.Subscription
 import org.lettux.extension.defaultLaunch
 import org.lettux.extension.state
 import org.lettux.slice.SlicedStatesFlow
@@ -31,8 +32,8 @@ internal class DefaultStore<STATE : State>(
             states = SlicedStatesFlow(states, stateToSlice, sliceToState),
             storeScope = sliceScope,
             doSend = { action ->
-                val bridgeChain = Chain {
-                    val parentOutcome = doSend(action)
+                val bridgeChain = Chain { sliceAction ->
+                    val parentOutcome = doSend(sliceAction)
                     if (parentOutcome is Outcome.StateMutated) {
                         Outcome.StateMutated(stateToSlice(parentOutcome.state as STATE))
                     } else {
@@ -40,7 +41,7 @@ internal class DefaultStore<STATE : State>(
                     }
                 }
                 val chain = middlewares.reversed().fold(bridgeChain) { chain, middleware ->
-                    Chain { action -> middleware.intercept(action, state, chain) }
+                    Chain { action -> middleware.intercept(action, stateToSlice(state), chain) }
                 }
                 chain.proceed(action)
             },
