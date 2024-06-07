@@ -33,15 +33,3 @@ interface Store<STATE : State> {
      */
     fun send(action: Action): Job
 }
-
-internal interface SliceableStore<STATE : State> {
-    /**
-     * Creates a slice of the store's state.
-     */
-    fun <SLICE : State> slice(
-        stateToSlice: (STATE) -> SLICE,
-        sliceToState: (STATE, SLICE) -> STATE,
-        middlewares: List<Middleware> = emptyList(),
-        sliceScope: CoroutineScope,
-    ): Store<SLICE>
-}

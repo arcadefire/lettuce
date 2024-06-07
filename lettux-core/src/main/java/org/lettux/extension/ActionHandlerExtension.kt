@@ -2,6 +2,7 @@ package org.lettux.extension
 
 import org.lettux.core.ActionHandler
 import org.lettux.core.State
+import org.lettux.core.Subscription
 
 fun <STATE : State, SLICE : State> ActionHandler<SLICE>.pullback(
     stateToSlice: (STATE) -> SLICE,
@@ -17,4 +18,8 @@ fun <STATE : State> combine(vararg handlers: ActionHandler<STATE>): ActionHandle
     return ActionHandler {
         handlers.forEach { handler -> with(handler) { handle(it) } }
     }
+}
+
+operator fun <S : State> ActionHandler<S>.plus(another: ActionHandler<S>): ActionHandler<S> {
+    return combine(this, another)
 }

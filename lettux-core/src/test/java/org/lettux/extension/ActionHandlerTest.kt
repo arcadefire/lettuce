@@ -19,7 +19,7 @@ internal class ActionHandlerTest {
             val sliceActionHandler = ActionHandler<PlainState> {
                 commit(state.copy(value = state.value + 1))
             }
-            val store = createStore<NestedState>(
+            val store = createStore(
                 initialState = NestedState(PlainState()),
                 actionHandler = sliceActionHandler.pullback(
                     stateToSlice = { it.innerState },
@@ -54,6 +54,36 @@ internal class ActionHandlerTest {
             advanceUntilIdle()
 
             store.state shouldBe NestedState(PlainState(1))
+        }
+    }
+
+    @Test
+    fun `should combine action handlers into an aggregated one`() {
+        runTest {
+            val firstActionHandler = ActionHandler<NestedState> { action ->
+                when (action) {
+                    FirstAction -> {
+                        commit(state.copy(innerState = state.innerState.copy(value = 1)))
+                    }
+                }
+            }
+            val secondActionHandler = ActionHandler<NestedState> { action ->
+                when (action) {
+                    SecondAction -> {
+                        commit(state.copy(innerState = state.innerState.copy(value = 2)))
+                    }
+                }
+            }
+            val store = createStore(
+                initialState = NestedState(PlainState()),
+                actionHandler = firstActionHandler + secondActionHandler,
+            ).get(storeScope = this)
+
+            store.send(FirstAction)
+            store.state shouldBe NestedState(PlainState(1))
+
+            store.send(SecondAction)
+            store.state shouldBe NestedState(PlainState(2))
         }
     }
 
