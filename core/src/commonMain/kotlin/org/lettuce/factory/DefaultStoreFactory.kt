@@ -1,18 +1,18 @@
-package org.lettux.factory
+package org.lettuce.factory
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.lettux.DefaultActionContext
-import org.lettux.DefaultStore
-import org.lettux.core.ActionHandler
-import org.lettux.core.Chain
-import org.lettux.core.Middleware
-import org.lettux.core.Outcome
-import org.lettux.core.State
-import org.lettux.core.Store
-import org.lettux.core.Subscription
+import org.lettuce.DefaultActionContext
+import org.lettuce.DefaultStore
+import org.lettuce.core.ActionHandler
+import org.lettuce.core.Chain
+import org.lettuce.core.Middleware
+import org.lettuce.core.Outcome
+import org.lettuce.core.State
+import org.lettuce.core.Store
+import org.lettuce.core.Subscription
 
 fun <STATE : State> createStore(
     initialState: STATE,

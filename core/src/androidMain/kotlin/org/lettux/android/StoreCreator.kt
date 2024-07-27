@@ -1,12 +1,12 @@
-package org.lettux.android
+package org.lettuce.android
 
 import kotlinx.coroutines.CoroutineScope
-import org.lettux.core.ActionHandler
-import org.lettux.core.Middleware
-import org.lettux.core.State
-import org.lettux.core.Store
-import org.lettux.core.Subscription
-import org.lettux.factory.createStore
+import org.lettuce.core.ActionHandler
+import org.lettuce.core.Middleware
+import org.lettuce.core.State
+import org.lettuce.core.Store
+import org.lettuce.core.Subscription
+import org.lettuce.factory.createStore
 
 fun interface StoreCreator<S : State> {
     fun create(scope: CoroutineScope): Store<S>

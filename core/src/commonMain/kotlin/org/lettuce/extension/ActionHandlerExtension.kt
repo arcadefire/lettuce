@@ -1,8 +1,8 @@
-package org.lettux.extension
+package org.lettuce.extension
 
-import org.lettux.core.ActionHandler
-import org.lettux.core.State
-import org.lettux.core.Subscription
+import org.lettuce.core.ActionHandler
+import org.lettuce.core.State
+import org.lettuce.core.Subscription
 
 fun <STATE : State, SLICE : State> ActionHandler<SLICE>.pullback(
     stateToSlice: (STATE) -> SLICE,

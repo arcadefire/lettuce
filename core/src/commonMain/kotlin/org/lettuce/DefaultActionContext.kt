@@ -1,9 +1,9 @@
-package org.lettux
+package org.lettuce
 
 import kotlinx.coroutines.Job
-import org.lettux.core.Action
-import org.lettux.core.ActionContext
-import org.lettux.core.State
+import org.lettuce.core.Action
+import org.lettuce.core.ActionContext
+import org.lettuce.core.State
 
 class DefaultActionContext<STATE : State>(
     private val sendFunction: (Action) -> Job,

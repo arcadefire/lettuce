@@ -1,13 +1,13 @@
-package org.lettux
+package org.lettuce
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import org.lettux.core.ActionHandler
-import org.lettux.core.Middleware
-import org.lettux.core.Outcome
-import org.lettux.extension.state
-import org.lettux.factory.createStore
+import org.lettuce.core.ActionHandler
+import org.lettuce.core.Middleware
+import org.lettuce.core.Outcome
+import org.lettuce.extension.state
+import org.lettuce.factory.createStore
 
 internal class DefaultStoreTest {
 

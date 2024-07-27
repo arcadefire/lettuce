@@ -1,10 +1,9 @@
 
-# Lettux
-Lettux is a lightweight, Redux-like library that provides a structured and efficient way to manage the state 
+Lettuce is a lightweight, Redux-like library that provides a structured and efficient way to manage the state 
 of your application and maintain it in good health.
 
 ## Core Concepts
-At the heart of Lettux is the concept of a _Store_. 
+At the heart of lettuce is the concept of a _Store_. 
 
 It serves as a central repository for your application's state and provides a mechanism for 
 interacting with and modifying it. 
@@ -94,7 +93,7 @@ val loggerMiddleware = Middleware { action: Action, state: State, chain: Chain -
 ```
 
 ## State slicing
-Lettux allows you to create slices of the central store's state.
+lettuce allows you to create slices of the central store's state.
 
 These slices provide a focused view of a specific portion of the state, simplifying state management 
 for complex applications by allowing different parts of your UI to work with only the state they need.

@@ -1,4 +1,4 @@
-package org.lettux.slice
+package org.lettuce.slice
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineScope
@@ -8,18 +8,18 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import org.lettux.HandledAction
-import org.lettux.NestedState
-import org.lettux.PlainState
-import org.lettux.UnHandledAction
-import org.lettux.core.ActionHandler
-import org.lettux.core.Middleware
-import org.lettux.core.Outcome
-import org.lettux.core.Store
-import org.lettux.core.Subscription
-import org.lettux.extension.state
-import org.lettux.factory.sliceStore
-import org.lettux.factory.createStore
+import org.lettuce.HandledAction
+import org.lettuce.NestedState
+import org.lettuce.PlainState
+import org.lettuce.UnHandledAction
+import org.lettuce.core.ActionHandler
+import org.lettuce.core.Middleware
+import org.lettuce.core.Outcome
+import org.lettuce.core.Store
+import org.lettuce.core.Subscription
+import org.lettuce.extension.state
+import org.lettuce.factory.sliceStore
+import org.lettuce.factory.createStore
 
 internal class SliceTest {
 

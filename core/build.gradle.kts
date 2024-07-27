@@ -53,7 +53,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.lettux"
+    namespace = "org.lettuce"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.lettux"
+    group = "org.lettuce"
     version = "0.2-SNAPSHOT"
 }
 

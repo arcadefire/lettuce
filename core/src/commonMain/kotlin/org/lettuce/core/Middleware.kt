@@ -1,4 +1,4 @@
-package org.lettux.core
+package org.lettuce.core
 
 fun interface Middleware {
     suspend fun intercept(action: Action, state: State, chain: Chain): Outcome

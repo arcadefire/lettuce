@@ -1,12 +1,12 @@
-package org.lettux.factory
+package org.lettuce.factory
 
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.lettux.core.Middleware
-import org.lettux.core.SliceableStore
-import org.lettux.core.State
-import org.lettux.core.Store
-import org.lettux.core.Subscription
+import org.lettuce.core.Middleware
+import org.lettuce.core.SliceableStore
+import org.lettuce.core.State
+import org.lettuce.core.Store
+import org.lettuce.core.Subscription
 
 fun <STATE : State, SLICE : State> sliceStore(
     store: Store<STATE>,

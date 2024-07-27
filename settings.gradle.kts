@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "lettux"
+rootProject.name = "lettuce"
 include(":core")

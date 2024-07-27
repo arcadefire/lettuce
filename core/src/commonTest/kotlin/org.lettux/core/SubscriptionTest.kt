@@ -1,4 +1,4 @@
-package org.lettux.core
+package org.lettuce.core
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.cancel
@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
-import org.lettux.HandledAction
+import org.lettuce.HandledAction
 import kotlin.test.Test
-import org.lettux.PlainState
-import org.lettux.UnHandledAction
-import org.lettux.extension.combine
-import org.lettux.factory.createStore
+import org.lettuce.PlainState
+import org.lettuce.UnHandledAction
+import org.lettuce.extension.combine
+import org.lettuce.factory.createStore
 
 internal class SubscriptionTest {
 

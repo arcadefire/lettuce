@@ -1,4 +1,4 @@
-package org.lettux.android.logger
+package org.lettuce.android.logger
 
 import android.util.Log
 

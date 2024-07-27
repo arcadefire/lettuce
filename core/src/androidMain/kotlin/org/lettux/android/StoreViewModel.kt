@@ -1,12 +1,12 @@
-package org.lettux.android
+package org.lettuce.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import org.lettux.core.Action
-import org.lettux.core.State
-import org.lettux.core.Store
+import org.lettuce.core.Action
+import org.lettuce.core.State
+import org.lettuce.core.Store
 
 abstract class StoreViewModel<S : State>(storeCreator: StoreCreator<S>) : Store<S>, ViewModel() {
 

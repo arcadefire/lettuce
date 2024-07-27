@@ -1,4 +1,4 @@
-package org.lettux.core
+package org.lettuce.core
 
 import kotlinx.coroutines.CoroutineScope
 

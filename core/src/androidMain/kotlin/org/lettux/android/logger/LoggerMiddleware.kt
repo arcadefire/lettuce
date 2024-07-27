@@ -1,11 +1,11 @@
-package org.lettux.android.logger
+package org.lettuce.android.logger
 
 import android.util.Log
-import org.lettux.core.Action
-import org.lettux.core.Chain
-import org.lettux.core.Middleware
-import org.lettux.core.Outcome
-import org.lettux.core.State
+import org.lettuce.core.Action
+import org.lettuce.core.Chain
+import org.lettuce.core.Middleware
+import org.lettuce.core.Outcome
+import org.lettuce.core.State
 import java.util.concurrent.atomic.AtomicInteger
 
 class LoggerMiddleware(private val logger: LogsWriter = AndroidLogsWriter) : Middleware {

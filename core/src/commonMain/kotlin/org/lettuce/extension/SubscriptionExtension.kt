@@ -1,8 +1,8 @@
-package org.lettux.extension
+package org.lettuce.extension
 
 import kotlinx.coroutines.flow.merge
-import org.lettux.core.State
-import org.lettux.core.Subscription
+import org.lettuce.core.State
+import org.lettuce.core.Subscription
 
 fun <STATE : State> combine(vararg subscriptions: Subscription<STATE>): Subscription<STATE> {
     return if (subscriptions.size == 1) {

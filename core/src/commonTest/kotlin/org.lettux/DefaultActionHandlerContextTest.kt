@@ -1,4 +1,4 @@
-package org.lettux
+package org.lettuce
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Job

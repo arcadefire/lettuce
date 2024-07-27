@@ -1,15 +1,15 @@
-package org.lettux.extension
+package org.lettuce.extension
 
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
-import org.lettux.HandledAction
-import org.lettux.NestedState
-import org.lettux.PlainState
-import org.lettux.core.Action
-import org.lettux.core.ActionHandler
-import org.lettux.factory.createStore
+import org.lettuce.HandledAction
+import org.lettuce.NestedState
+import org.lettuce.PlainState
+import org.lettuce.core.Action
+import org.lettuce.core.ActionHandler
+import org.lettuce.factory.createStore
 
 internal class ActionHandlerTest {
 

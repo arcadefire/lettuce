@@ -1,18 +1,18 @@
-package org.lettux
+package org.lettuce
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.lettux.core.Action
-import org.lettux.core.Chain
-import org.lettux.core.Middleware
-import org.lettux.core.Outcome
-import org.lettux.core.SliceableStore
-import org.lettux.core.State
-import org.lettux.core.Store
-import org.lettux.extension.defaultLaunch
-import org.lettux.extension.state
-import org.lettux.slice.SlicedStatesFlow
+import org.lettuce.core.Action
+import org.lettuce.core.Chain
+import org.lettuce.core.Middleware
+import org.lettuce.core.Outcome
+import org.lettuce.core.SliceableStore
+import org.lettuce.core.State
+import org.lettuce.core.Store
+import org.lettuce.extension.defaultLaunch
+import org.lettuce.extension.state
+import org.lettuce.slice.SlicedStatesFlow
 
 internal class DefaultStore<STATE : State>(
     override val states: MutableStateFlow<STATE>,

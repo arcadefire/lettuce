@@ -15,7 +15,7 @@ publishing {
         })
 
         pom {
-            name.set("Lettux multiplatform library")
+            name.set("lettuce multiplatform library")
             description.set("Simple Redux implementation written in Kotlin.")
             url.set("https://github.com/Kotlin/multiplatform-library-template")
 

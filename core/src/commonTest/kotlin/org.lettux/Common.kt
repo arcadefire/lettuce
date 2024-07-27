@@ -1,7 +1,7 @@
-package org.lettux
+package org.lettuce
 
-import org.lettux.core.Action
-import org.lettux.core.State
+import org.lettuce.core.Action
+import org.lettuce.core.State
 
 object HandledAction : Action
 object UnHandledAction : Action
