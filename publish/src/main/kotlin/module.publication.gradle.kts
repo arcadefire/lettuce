@@ -1,46 +1,43 @@
-import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.bundling.Jar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.kotlin.dsl.`maven-publish`
 
 plugins {
     `maven-publish`
     signing
+    id("com.vanniktech.maven.publish")
 }
 
-publishing {
-    publications.withType<MavenPublication> {
-        artifact(tasks.register("${name}JavadocJar", Jar::class) {
-            archiveClassifier.set("javadoc")
-            archiveAppendix.set(this@withType.name)
-        })
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+}
 
-        pom {
-            name.set("lettuce multiplatform library")
-            description.set("Simple Redux implementation written in Kotlin.")
-            url.set("https://github.com/Kotlin/multiplatform-library-template")
+mavenPublishing {
+    coordinates("io.github.arcadefire", "lettuce", "0.2")
 
-            licenses {
-                license {
-                    name.set("MIT")
-                    url.set("https://opensource.org/licenses/MIT")
-                }
-            }
-            developers {
-                developer {
-                    id.set("arcadefire")
-                    name.set("Angelo Marchesin")
-                }
-            }
-            scm {
-                url.set("https://github.com/Kotlin/multiplatform-library-template")
+    pom {
+        name.set("Lettuce multiplatform library")
+        description.set("Simple Redux implementation written in Kotlin")
+        inceptionYear.set("2024")
+        url.set("https://github.com/arcadefire/lettuce.git")
+        licenses {
+            license {
+                name.set("MIT")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("https://opensource.org/licenses/MIT")
             }
         }
-    }
-}
-
-signing {
-    if (project.hasProperty("signing.gnupg.keyName")) {
-        useGpgCmd()
-        sign(publishing.publications)
+        developers {
+            developer {
+                id.set("arcadefire")
+                name.set("Angelo Marchesin")
+                url.set("https://github.com/arcadefire/")
+            }
+        }
+        scm {
+            url.set("https://github.com/arcadefire/lettuce.git")
+            connection.set("scm:git:git:github.com/arcadefire/lettuce.git")
+            developerConnection.set("scm:git:ssh://git@github.com/arcadefire/lettuce.git")
+        }
     }
 }

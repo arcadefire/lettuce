@@ -19,10 +19,6 @@ kotlin {
         }
     }
 
-    js {
-        browser()
-    }
-
     sourceSets {
         all {
             with(languageSettings) {
@@ -53,7 +49,7 @@ kotlin {
 }
 
 android {
-    namespace = "org.lettuce"
+    namespace = "io.github.arcadefire.lettuce"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

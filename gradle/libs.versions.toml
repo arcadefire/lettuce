@@ -2,6 +2,7 @@
 agp = "8.0.2"
 atomicfu = "0.23.2"
 coreKtx = "1.13.1"
+gradleMavenPublishPlugin = "0.29.0"
 kotestAssertionsCore = "5.9.0"
 kotlin = "2.0.0"
 kotlinxCoroutinesCore = "1.8.1"
@@ -9,11 +10,11 @@ android-minSdk = "24"
 android-compileSdk = "34"
 kotlinxCoroutinesTest = "1.8.1"
 lifecycleViewmodelKtx = "2.7.0"
-mockk = "1.13.11"
 nexus-publish = "2.0.0-rc-1"
 
 [libraries]
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+gradle-maven-publish-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotestAssertionsCore" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
