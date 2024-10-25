@@ -58,7 +58,7 @@ val counterActionHandler = ActionHandler<AppState> { action: Action ->
 ```
 
 ## Subscriptions
-Subscriptions provide a way to react to state changes. gcYou can tap into the flow of states and trigger new actions based on state transitions.
+Subscriptions provide a way to react to state changes. You can tap into the flow of states and trigger new actions based on state transitions.
 
 ```kotlin
 val counterSubscription = Subscription<AppState> { states: Flow<AppState> ->
