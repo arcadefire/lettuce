@@ -13,7 +13,7 @@ mavenPublishing {
 }
 
 mavenPublishing {
-    coordinates("io.github.arcadefire", "lettuce", "0.2")
+    coordinates("io.github.arcadefire", "lettuce", version.toString())
 
     pom {
         name.set("Lettuce multiplatform library")
