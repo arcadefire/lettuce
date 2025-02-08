@@ -46,7 +46,8 @@ internal class SliceTest {
         val sliced: Store<PlainState> = sliceStore(
             store = testStore(storeScope = this),
             stateToSlice = { state -> state.innerState },
-            sliceToState = { state, slice -> state.copy(innerState = slice) }
+            sliceToState = { state, slice -> state.copy(innerState = slice) },
+            sliceScope = this,
         )
 
         sliced.send(HandledAction)
@@ -71,6 +72,7 @@ internal class SliceTest {
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
             middlewares = listOf(first, second),
+            sliceScope = this,
         )
 
         sliced.send(HandledAction)
@@ -94,6 +96,7 @@ internal class SliceTest {
             stateToSlice = { state -> state.innerState },
             sliceToState = { state, slice -> state.copy(innerState = slice) },
             middlewares = listOf(first, second),
+            sliceScope = this,
         )
 
         sliced.send(HandledAction)
@@ -113,6 +116,7 @@ internal class SliceTest {
                 stateToSlice = { state -> state.innerState },
                 sliceToState = { state, slice -> state.copy(innerState = slice) },
                 middlewares = listOf(middleware),
+                sliceScope = this,
             )
 
             sliced.send(HandledAction)
@@ -132,6 +136,7 @@ internal class SliceTest {
                 stateToSlice = { state -> state.innerState },
                 sliceToState = { state, slice -> state.copy(innerState = slice) },
                 middlewares = listOf(middleware),
+                sliceScope = this,
             )
 
             sliced.send(UnHandledAction)
@@ -154,6 +159,7 @@ internal class SliceTest {
                 stateToSlice = { state -> state.innerState },
                 sliceToState = { state, slice -> state.copy(innerState = slice) },
                 subscription = subscription,
+                sliceScope = this,
             )
 
             sliced.send(HandledAction)

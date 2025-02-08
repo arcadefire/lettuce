@@ -24,9 +24,8 @@ fun <STATE : State> createStore(
     lateinit var store: Store<STATE>
 
     val statesFlow = MutableStateFlow(initialState)
-    val pipeline = middlewares
-        .reversed()
-        .fold(
+    val chain: Chain = middlewares
+        .foldRight(
             Chain { action ->
                 val actionContext = DefaultActionContext(
                     sendFunction = store::send,
@@ -48,14 +47,14 @@ fun <STATE : State> createStore(
                     Outcome.NoMutation
                 }
             }
-        ) { chain, middleware ->
+        ) { middleware, chain ->
             Chain { action -> middleware.intercept(action, statesFlow.value, chain) }
         }
 
     return DefaultStore(
         states = statesFlow,
         storeScope = storeScope,
-        doSend = { action -> pipeline.proceed(action) },
+        doSend = { action -> chain.proceed(action) },
     ).also {
         store = it
         subscription?.apply {

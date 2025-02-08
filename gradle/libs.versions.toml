@@ -1,15 +1,15 @@
 [versions]
 agp = "8.0.2"
 atomicfu = "0.23.2"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 gradleMavenPublishPlugin = "0.29.0"
 kotestAssertionsCore = "5.9.0"
 kotlin = "2.0.0"
-kotlinxCoroutinesCore = "1.8.1"
+kotlinxCoroutinesCore = "1.10.1"
 android-minSdk = "24"
 android-compileSdk = "34"
-kotlinxCoroutinesTest = "1.8.1"
-lifecycleViewmodelKtx = "2.7.0"
+kotlinxCoroutinesTest = "1.10.1"
+lifecycleViewmodelKtx = "2.8.7"
 nexus-publish = "2.0.0-rc-1"
 
 [libraries]
