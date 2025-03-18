@@ -10,9 +10,6 @@ plugins {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
-}
-
-mavenPublishing {
     coordinates("io.github.arcadefire", "lettuce", version.toString())
 
     pom {
