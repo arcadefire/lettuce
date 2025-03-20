@@ -1,23 +1,28 @@
+import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    id("module.publication")
+    alias(libs.plugins.vanniktech.mavenPublish)
 }
 
+group = "io.github.arcadefire"
+version = "0.3.2"
+
 kotlin {
-    targetHierarchy.default()
-
     jvm()
-
     androidTarget {
         publishLibraryVariants("release")
-
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     sourceSets {
         all {
@@ -53,5 +58,43 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+
+    coordinates(group.toString(), "lettuce", version.toString())
+
+    pom {
+        name.set("Lettuce multiplatform library")
+        description.set("Simple Redux implementation written in Kotlin")
+        inceptionYear.set("2024")
+        url.set("https://github.com/arcadefire/lettuce.git")
+        licenses {
+            license {
+                name.set("MIT")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("https://opensource.org/licenses/MIT")
+            }
+        }
+        developers {
+            developer {
+                id.set("arcadefire")
+                name.set("Angelo Marchesin")
+                url.set("https://github.com/arcadefire/")
+            }
+        }
+        scm {
+            url.set("https://github.com/arcadefire/lettuce.git")
+            connection.set("scm:git:git:github.com/arcadefire/lettuce.git")
+            developerConnection.set("scm:git:ssh://git@github.com/arcadefire/lettuce.git")
+        }
     }
 }
